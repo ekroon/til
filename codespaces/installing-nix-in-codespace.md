@@ -18,3 +18,15 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 mkdir -p $HOME/.config/nix 2>/dev/null
 echo "experimental-features = nix-command flakes" > $HOME/.config/nix/nix.conf
 ```
+
+Everytime a codespace starts it is needed to fix the /tmp ACL settings to not get aborted builds as Nix expects certain chmod values:
+- See https://github.com/NixOS/nix/issues/6680#issuecomment-1230902525
+
+Fix this with:
+```bash
+setfacl -k /tmp
+```
+As this is something that can be downloaded from the cache, it is also possible to run this with Nix itself after installing:
+```bash
+nix shell 'nixpkgs#acl' --command bash -c 'sudo env PATH=$PATH setfacl -k /tmp'
+```
